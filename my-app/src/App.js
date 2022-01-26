@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
-import Statistics from './components/Statistics';
-
+import Statistics from './components/Statistics/Statistics';
+import FeedbackOptions from './components/FeedbackOptions/FeedbackOptions';
+import Section from './components/Section/Section';
+import Notification from './components/Notification/Notification';
 class App extends Component {
   state = {
-    good: 10,
-    neutral: 5,
-    bad: 3,
+    good: 0,
+    neutral: 0,
+    bad: 0,
+  };
+
+  onLeaveFeedback = option => {
+    this.setState(state => ({
+      [option]: state[option] + 1,
+    }));
   };
 
   countTotalFeedback = () => {
@@ -13,30 +21,35 @@ class App extends Component {
   };
 
   countPositiveFeedbackPercentage = () => {
-    return Math.round((this.state.good / this.countTotalFeedback()) * 100);
+    return Math.round((this.state.good / this.countTotalFeedback()) * 100) || 0;
   };
 
   render() {
+    const btns = Object.keys(this.state);
     return (
       <>
-        <div>
-          <h2>Please leave feedback</h2>
-          <button type="button">Good</button>
-          <button type="button">Neutral</button>
-          <button type="button">Bad</button>
-        </div>
-        <h2>Statistics</h2>
-        <Statistics
-          good={this.state.good}
-          neutral={this.state.neutral}
-          bad={this.state.bad}
-          total={this.countTotalFeedback()}
-          positive
-          // feedback={this.countPositiveFeedbackPercentage()}
-        />
+        <Section title={'Please leave feedback'}>
+          <FeedbackOptions
+            options={btns}
+            onLeaveFeedback={this.onLeaveFeedback}
+          />
+        </Section>
+
+        <Section title={'Statistics'}>
+          {this.countTotalFeedback() ? (
+            <Statistics
+              good={this.state.good}
+              neutral={this.state.neutral}
+              bad={this.state.bad}
+              total={this.countTotalFeedback()}
+              positivePercentage={this.countPositiveFeedbackPercentage()}
+            />
+          ) : (
+            <Notification message="There is no feedback" />
+          )}
+        </Section>
       </>
     );
   }
 }
-
 export default App;
